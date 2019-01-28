@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Small sheep run</title>
+</head>
+<style>
+        span{
+                position: absolute;
+                top:50%;
+                left:50%;
+                margin-top:-232px;
+                margin-left:-300px;
+                /* margin-right:-175px; */
+                width:600px;
+                height:100px;
+                line-height:33px;
+                z-index:99;
+                color:#fff;
+                font-size:18px;
+        }
+        .stage {
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                width: 100%;
+                height: 100%;
+                background-color: rgb(47, 163, 230);
+                overflow: hidden;
+        }
+        .sheep {
+                position: absolute;
+                right: -164px;
+                bottom: 20px;
+                width: 164px;
+                height: 122px;
+                background-image: url('sheep.png');
+                background-position:0 0;
+                background-repeat: no-repeat;
+                cursor:pointer;
+        }
+</style>
+<body>
+        <embed src="poem.mp3">
+<span>
+</span>
+<div class="stage">
+        <!-- <div class="sheep"></div> -->
+</div>
+<script>
+ //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++文字渐出      
+        var num = 0;
+        var str = "每个人出生的时候都是一张白纸，在经过不长不短的人生旅途，或许有很多快乐，\
+或许有很多酸甜苦辣， 生活就是这样五味杂陈！从上学到工作，我们走到现在，像动\
+画中的小羊一样，有的人跑得快，有的人跑得慢，但是你心中的那一张白纸怎么走、\
+怎么画都是由你自己来决定的，祝愿每一个人都能通过自己的努力，画出属于你的最美风景！";
+        window.onload = function fading(){
+                var span = document.getElementsByTagName('span')[0];
+                        span.innerHTML += str.charAt(num);  
+                        num++;
+                        var timer = setTimeout(fading,100)
+                        if(num == str.length){
+                                clearTimeout(timer);
+                        }
+        }
+
+
+   
+        //思路：如何实现2个动画：自身运动和自身移动
+        //         两个动画的协调（通过调整定时器的速度来协调两个的动画）
+                
+//+++++++++++++++++小羊自身运动
+                        // var sheep = document.getElementsByClassName('sheep')[0];
+                        // var num = 0;
+                        // var run = 0;
+                        // var  sheepS = setInterval(function(){
+                        //         num +=164;
+                        //         if(num == 1312){
+                        //         num = 0; 
+                        //         }
+                        // sheep.style.backgroundPosition = -num+"px " +0+"px";    
+                        // },60)
+
+// +++++++++++++++++++小羊移动奔跑
+                        // var sheepR = setInterval(function(){
+                        //         run = sheep.offsetLeft -9;
+                        //         if(sheep.offsetLeft<=-164){
+                        //                 clearInterval(sheepS);
+                        //                 clearInterval(sheepR);
+                        //                 console.log('a')
+                        //         }
+                        //         sheep.style.left = run + 'px';
+                        // },70)
+//立即执行函数：防治变量污染；利用构造函数来构造小羊
+(function(){
+                                var obj = {
+                                        sheepA :0,//小羊自身运动参数
+                                        sheepR : 0,//小羊移动参数
+                                        settime : 80,//定时器时间参数
+                                        speed : 5,//小羊移动的速度
+                                        stage : document.getElementsByClassName('stage')[0],//舞台
+                                        sheepW : 164,
+                                        sheepNam : 10
+                                }
+                                // console.log(obj.stage)
+                                function Sheepfactory(data){
+                                        this.sheep = document.createElement('div');
+                                        this.stage = data.stage;
+                                        data.stage.appendChild(this.sheep);
+                                        this.sheep.className = "sheep";
+                                        this.sheepA = data.sheepA;
+                                        this.speedorigin = data.speed;
+                                        this.sheepR = data.sheepR;
+                                        this.settime = Math.floor(data.settime*Math.random())+20;
+                                        this.speed = data.speed;
+                                        this.top = 0;
+                                        this.sheepW = data.sheepW;
+                                        this.sheepNam = data.sheepNam;
+                                }
+                        // var sheep = new Sheepfactory(obj) 
+                        // console.log(sheep)
+                        init()//入口函数
+                        function init(){
+                                createSheep();
+                        }
+//+++++++++++++++++++++++++++++++++++++++++++创建小羊
+                        function createSheep(){
+                               var timer = setInterval(function(){
+                                       // console.log(sheepfactory)
+                                        if(obj.stage.children.length >= obj.sheepNam){
+                                                return false;
+                                        }else{
+                                                var sheepfactory = new Sheepfactory(obj);
+                                                sheepRun(sheepfactory);
+                                        }
+                                },1500)
+                        }
+
+                function sheepRun(Sheepfactory){
+//+++++++++++++++++++++++++++++++++++++++++++++小羊自身运动
+                                var  sheepS = setInterval(function(){
+                                        Sheepfactory.sheepA +=164;
+                                        if(Sheepfactory.sheepA == (8*Sheepfactory.sheepW)){
+                                                Sheepfactory.sheepA = 0; 
+                                        }
+                                Sheepfactory.sheep.style.backgroundPosition = -Sheepfactory.sheepA+"px " +Sheepfactory.top+"px";    
+                                },Sheepfactory.settime)
+
+// ++++++++++++++++++++++++++++++++++++++++++小羊移动奔跑
+                                var sheepR = setInterval(function(){
+                                        Sheepfactory.sheepR = Sheepfactory.sheep.offsetLeft -Sheepfactory.speed;
+                                        if(Sheepfactory.sheepR <=-164){
+                                                clearInterval(sheepS);
+                                                clearInterval(sheepR);
+                                                Sheepfactory.stage.removeChild(Sheepfactory.sheep);
+                                                // console.log('a')
+                                        }
+                                        Sheepfactory.sheep.style.left = Sheepfactory.sheepR + 'px';
+                                },Sheepfactory.settime)    
+                                // console.log(sheepfactory.sheep)      
+// ++++++++++++++++++++++++++++++++++++++++++小羊拖拽  
+                        console.log(Sheepfactory)      
+                                Sheepfactory.sheep.addEventListener('mousedown',function(e){
+                                                // console.log(e)
+                                                var event = e || event;
+                                                // console.log(e)
+                                                Sheepfactory.top = -122;
+                                                Sheepfactory.speed = 0;
+                                                Sheepfactory.x = event.pageX;//当鼠标点击的时候记录当前的位置
+                                                Sheepfactory.y = event.pageY;
+                                                console.log(Sheepfactory.y)
+                                        document.addEventListener('mousemove',runer)
+                                                function runer(e){
+                                                        var event = e || event;
+                                                        Sheepfactory.sheep.style.left = (event.pageX - Sheepfactory.x) + Sheepfactory.sheep.offsetLeft + "px";
+                                                        Sheepfactory.sheep.style.top = (event.pageY - Sheepfactory.y) + Sheepfactory.sheep.offsetTop+ "px";
+                                                        Sheepfactory.x = event.pageX;//当鼠标点击的时候记录当前的位置
+                                                        Sheepfactory.y = event.pageY;
+                                                }
+                                                this.addEventListener('mouseup',function(e){
+                                                        var event = e || event;
+                                                        document.removeEventListener('mousemove',runer);
+                                                        Sheepfactory.top = 0;
+                                                        Sheepfactory.speed = Sheepfactory.speedorigin;//速度怎么获取：
+                                                })
+                                        },false)
+                }
+}())
+</script>
+</body>
+
+</html>
